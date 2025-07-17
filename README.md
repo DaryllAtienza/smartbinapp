@@ -1,4 +1,4 @@
-# flutter_application_1
+# smartbinapp
 
 A new Flutter project.
 
