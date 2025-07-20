@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/collection_history_page.dart';
 import 'package:flutter_application_1/dashboard_page.dart';
 import 'package:flutter_application_1/notification_page.dart';
 import 'signup_page.dart';
@@ -10,6 +11,8 @@ void main() {
 }
 
 class DryWasteSegregationApp extends StatelessWidget {
+  const DryWasteSegregationApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,7 +26,8 @@ class DryWasteSegregationApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),
         '/dashboard': (context) => DashboardPage(),
-        '/notification': (context) => const NotificationPage(),
+        '/notification': (context) => NotificationPage(),
+        '/history': (context) => CollectionHistoryPage(),
       },
     );
   }

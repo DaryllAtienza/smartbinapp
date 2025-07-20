@@ -81,7 +81,9 @@ class HomePage extends StatelessWidget {
                       width: buttonWidth,
                       icon: Icons.history,
                       text: 'Collection History',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushNamed(context, '/history');
+                      },
                     ),
                     const SizedBox(height: 20),
                     buildNavButton(
