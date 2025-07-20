@@ -5,6 +5,13 @@ class NotificationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🟢 Sample notifications
+    final List<String> notifications = [
+      "Bin (Plastic) is full. Please empty it.",
+      "Bin (Paper) is almost full.",
+      "Bin (Can) is almost full.",
+    ];
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       body: SafeArea(
@@ -59,17 +66,38 @@ class NotificationPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 🔔 Notification Cards
+            // 🔔 Dismissible Notification Cards
             Expanded(
-              child: ListView(
+              child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  notificationCard("Bin (Plastic) is full. Please empty it."),
-                  const SizedBox(height: 16),
-                  notificationCard("Bin (Paper) is almost full."),
-                  const SizedBox(height: 16),
-                  notificationCard(" Bin (Can) is almost full."),
-                ],
+                itemCount: notifications.length,
+                itemBuilder: (context, index) {
+                  final message = notifications[index];
+                  return Column(
+                    children: [
+                      Dismissible(
+                        key: Key(message),
+                        direction: DismissDirection.endToStart,
+                        onDismissed: (direction) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Dismissed: $message")),
+                          );
+                        },
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 20),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade400,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        child: notificationCard(message),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  );
+                },
               ),
             ),
 

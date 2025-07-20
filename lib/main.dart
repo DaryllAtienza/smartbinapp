@@ -10,8 +10,6 @@ void main() {
 }
 
 class DryWasteSegregationApp extends StatelessWidget {
-  const DryWasteSegregationApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
