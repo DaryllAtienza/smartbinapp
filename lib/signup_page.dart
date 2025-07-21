@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -8,14 +10,56 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   @override
   void dispose() {
-    nameController.dispose();
+    emailController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _registerUser() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost/api/signup.php'),
+        headers: {
+        'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+        }),
+);
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'] ?? 'Sign-up successful!')),
+        );
+        Navigator.pushNamed(context, '/login');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'] ?? 'Sign-up failed')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
   }
 
   @override
@@ -27,7 +71,6 @@ class _SignUpPageState extends State<SignUpPage> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
-              // Top header design
               Container(
                 width: double.infinity,
                 height: 180,
@@ -43,7 +86,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 child: Stack(
                   children: [
-                    Positioned(
+                    const Positioned(
                       top: 40,
                       left: 20,
                       child: Text(
@@ -67,84 +110,50 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
               const SizedBox(height: 40),
-
-              // Centered form
               Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 400),
+                  constraints: const BoxConstraints(maxWidth: 400),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Email Field
-                      const Text(
-                        'Email',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text('Email', style: TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       TextField(
-                        controller: nameController,
+                        controller: emailController,
                         decoration: InputDecoration(
                           hintText: 'Enter your email here',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.blue),
                           ),
                           focusedBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.blue,
-                              width: 2,
-                            ),
+                            borderSide: BorderSide(color: Colors.blue, width: 2),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                         ),
                       ),
                       const SizedBox(height: 20),
-
-                      // Password Field
-                      const Text(
-                        'Password',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text('Password', style: TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       TextField(
                         controller: passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
                           hintText: '********',
-                          suffixIcon: const Icon(
-                            Icons.lock_outline,
-                            color: Colors.blue,
-                          ),
+                          suffixIcon: const Icon(Icons.lock_outline, color: Colors.blue),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.blue),
                           ),
                           focusedBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.blue,
-                              width: 2,
-                            ),
+                            borderSide: BorderSide(color: Colors.blue, width: 2),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                         ),
                       ),
                       const SizedBox(height: 30),
-
-                      // Sign Up Button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Sign-up successful!'),
-                              ),
-                            );
-                          },
+                          onPressed: _registerUser,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF0050C8),
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -159,43 +168,23 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-
-                      // Already Registered Text
                       Center(
                         child: GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/login');
-                          },
+                          onTap: () => Navigator.pushNamed(context, '/login'),
                           child: const Text(
                             'Already Registered?\nLog in here.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 14,
-                            ),
+                            style: TextStyle(color: Colors.black87, fontSize: 14),
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 16),
-
-                      // Back to Home
                       Center(
                         child: GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              '/',
-                              (route) => false,
-                            );
-                          },
+                          onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false),
                           child: const Text(
                             '← Back to Welcome Screen',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
+                            style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 14),
                           ),
                         ),
                       ),
