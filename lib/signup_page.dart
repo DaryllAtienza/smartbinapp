@@ -30,7 +30,7 @@ class _SignUpPageState extends State<SignUpPage> {
       );
       return;
     }
-
+        //http request
     try {
       final response = await http.post(
         Uri.parse('http://localhost/api/signup.php'),
